@@ -41,6 +41,11 @@ module.exports = function(grunt){
                         src: 'bower_components/jquery/dist/jquery.min.js', 
                         dest: 'assets/js/vendor/jquery.js'
                     },
+                    // jQuery map
+                    {
+                        src: 'bower_components/jquery/dist/jquery.min.map', 
+                        dest: 'assets/js/vendor/jquery.min.map'
+                    },
                     // Backbone
                     {
                         src: 'bower_components/backbone/backbone.js', 
@@ -50,6 +55,11 @@ module.exports = function(grunt){
                     {
                         src: 'bower_components/underscore/underscore-min.js', 
                         dest: 'assets/js/vendor/underscore.js'
+                    },
+                    // Underscore map
+                    {
+                        src: 'bower_components/underscore/underscore-min.map', 
+                        dest: 'assets/js/vendor/underscore-min.map'
                     },
                     // Velocity
                     {
