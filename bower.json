@@ -1,0 +1,33 @@
+{
+  "name": "LPIndex web",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kasparsb/lpindexweb",
+  "authors": [
+    "Kaspars Bulins <kasparsb@hotmail.com>"
+  ],
+  "description": "Latvijas pasta indeksu meklēšnas web app",
+  "main": "app.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "lp",
+    "index"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "backbone": "~1.1.2",
+    "react": "~0.12.2",
+    "requirejs": "~2.1.16",
+    "velocity": "~1.2.2"
+  }
+}
