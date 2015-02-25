@@ -63,8 +63,13 @@ module.exports = function(grunt){
                     },
                     // Velocity
                     {
-                        src: 'bower_components/velocity/velocity.ui.min.js', 
+                        src: 'bower_components/velocity/velocity.min.js', 
                         dest: 'assets/js/vendor/velocity.js'
+                    },
+                    // Velocity ui
+                    {
+                        src: 'bower_components/velocity/velocity.ui.min.js', 
+                        dest: 'assets/js/vendor/velocityui.js'
                     },
                     // Marker clusterer
                     {
