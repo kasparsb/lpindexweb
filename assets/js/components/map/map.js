@@ -13,6 +13,14 @@ define(['react', 'components/map/infowindow', 'markerclusterer'], function(React
          * Collection of markers in map
          */
         markers: [],
+
+        /**
+         * Poststation map marker
+         */
+        postStationMarker: new google.maps.MarkerImage(
+            'assets/images/marker.png', null, null, null, 
+            new google.maps.Size( 29, 37 ) // Actual image is twice the size
+        ),
         
         componentDidMount: function() {
             this.createMap();
@@ -75,10 +83,13 @@ define(['react', 'components/map/infowindow', 'markerclusterer'], function(React
             this.mc = new MarkerClusterer(this.map, markers);
         },
         addMarker: function( place, lat, lng ) {
+            
+            
             var marker = new google.maps.Marker({
                 position: new google.maps.LatLng( lat, lng ),
                 //map: this.map,
-                draggable: false
+                draggable: false,
+                icon: this.postStationMarker
             });
             
             google.maps.event.addListener( marker, 'click', _.bind( function() {
