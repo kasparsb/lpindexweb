@@ -1,11 +1,17 @@
-/**
-* Created with React start.
-* User: kasparsb
-* Date: 2015-02-08
-* Time: 06:02 PM
-* To change this template use Tools | Templates.
-*/
-define(['jquery', 'env', 'components/main'], function($, Env, Main) {
+requirejs.config({
+    // Sadefinējam vendorus
+    paths: {
+        jquery: 'vendor/jquery' ,
+        react: 'vendor/react',
+        backbone: 'vendor/backbone',
+        underscore: 'vendor/underscore',
+        velocity: 'vendor/velocity',
+        markerclusterer: 'vendor/markerclusterer'
+    },
+    urlArgs: 'r=' + (new Date()).getTime(),
+});
+
+define(['jquery', 'react', 'env', 'components/main'], function($, React, Env, Main) {
     
     var App = {
         
