@@ -33,12 +33,18 @@ function(
             }
         },
         searchKeyPress: function(ev) {
-            //if ( ev.key == 'Enter' )
-            
-            var search = _.bind( this.startLoadSuggestions, this );
+            if ( ev.key == 'ArrowDown' )
+                this.refs.suggestions.next();
+            else if ( ev.key == 'ArrowUp' )
+                this.refs.suggestions.prev();
+            else if ( ev.key == 'Enter' )
+                this.refs.suggestions.clickSelected();
+            else {
+                var search = _.bind( this.startLoadSuggestions, this );
 
-            // Search palaižam nākošajā tick, lai uzreiz iegūtu ievadīto simbolu
-            _.delay( search, 1 )            
+                // Search palaižam nākošajā tick, lai uzreiz iegūtu ievadīto simbolu
+                _.delay( search, 1 )
+            }
         },
         startLoadSuggestions: function() {
             this.props.onBeforeSearch();
@@ -104,7 +110,7 @@ function(
                         type: 'text', 
                         ref: 'search',
                         placeholder: 'Ievadiet adresi',
-                        onKeyPress: this.searchKeyPress 
+                        onKeyDown: this.searchKeyPress 
                     } ),
                     React.DOM.span( { className:' ico' }, React.DOM.i( { className: 'fa fa-search' } ) ),
                     React.createElement( 

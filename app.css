@@ -199,7 +199,9 @@ input {
     border-top: 1px solid #ddd;
     cursor: pointer
 }
-
+.search-box .suggestions .item.selected {
+    background: #eee
+}
 .search-box .suggestions .item:first-child {
     border-top: 0
 }
