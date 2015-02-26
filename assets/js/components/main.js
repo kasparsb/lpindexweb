@@ -175,7 +175,7 @@ return React.createClass({
     
     handlePostStationInfoClose: function( poststation ) {
         this.refs.search.cleanUp();
-        this.refs.search.focus();
+        //this.refs.search.focus();
         this.refs.map.openInfoWindow( poststation );
         this.$poststation.hide();
     },
