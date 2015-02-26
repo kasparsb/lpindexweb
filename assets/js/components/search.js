@@ -36,26 +36,44 @@ function(
             }
         },
         searchKeyPress: function(ev) {
-            if ( ev.key == 'ArrowDown' )
-                this.refs.suggestions.next();
-            else if ( ev.key == 'ArrowUp' )
-                this.refs.suggestions.prev();
-            else if ( ev.key == 'Enter' )
-                this.refs.suggestions.clickSelected();
-            else {
-                
+            // If keyTypeHandlers found apropriate handler for current key, then it return true
+            if ( !this.keyTypeHandlers.execute.call( this, ev ) ) {
+
+                // No specific handler for key type found, so we can execute search
                 var search = _.bind( function(){
                     var s = this.getSearchPhrase();
 
                     // Search only if user has changed search phrase
                     if ( s !== this._lastSearchPhrase ) {
                         this._lastSearchPhrase = s;
+                        
                         this.startLoadSuggestions()
                     }
                 }, this );
 
                 // Delay search for next execution cycle, to get search field input
                 _.delay( search, 1 )
+            }
+        },
+        /**
+         * Pressed key type handlers. Here are defined function for every key type we need to handle
+         */
+        keyTypeHandlers: {
+            execute: function( ev ) {
+                if ( typeof this.keyTypeHandlers[ev.key] == 'function' ) {
+                    ev.preventDefault();
+                    this.keyTypeHandlers[ev.key].call( this );
+                    return true;
+                }
+            },
+            ArrowDown: function() {
+                this.refs.suggestions.next();
+            },
+            ArrowUp: function() {
+                this.refs.suggestions.prev();
+            },
+            Enter: function() {
+                this.refs.suggestions.clickSelected();
             }
         },
         startLoadSuggestions: function() {
