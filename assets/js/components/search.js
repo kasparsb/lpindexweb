@@ -33,17 +33,29 @@ function(
             }
         },
         searchKeyPress: function(ev) {
-            if ( ev.key == 'Enter' ) {
-                this.props.onBeforeSearch();
-                this.loadSuggestions();
-            }
+            //if ( ev.key == 'Enter' )
+            
+            var search = _.bind( this.startLoadSuggestions, this );
+
+            // Search palaižam nākošajā tick, lai uzreiz iegūtu ievadīto simbolu
+            _.delay( search, 1 )            
+        },
+        startLoadSuggestions: function() {
+            this.props.onBeforeSearch();
+            this.loadSuggestions();
+        },
+        /**
+         * Atgriežam ievadīto meklēšanas frāzi
+         */
+        getSearchPhrase: function() {
+            return $( this.refs.search.getDOMNode() ).val();
         },
         /**
          * Ielādējam suggestions
          */
         loadSuggestions: function() {
             $.get( 'http://pad.dyndns.org/lpindex/app/search/', {
-                q: $( this.refs.search.getDOMNode() ).val()
+                q: this.getSearchPhrase()
             }, _.bind( function( response ) {
                 // Papildinām katru item ar property full
                 for ( var i in response.results )
@@ -92,7 +104,7 @@ function(
                         type: 'text', 
                         ref: 'search',
                         placeholder: 'Ievadiet adresi',
-                        onKeyDown: this.searchKeyPress 
+                        onKeyPress: this.searchKeyPress 
                     } ),
                     React.DOM.span( { className:' ico' }, React.DOM.i( { className: 'fa fa-search' } ) ),
                     React.createElement( 
