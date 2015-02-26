@@ -24,6 +24,9 @@ function(
     
     return React.createClass({
         displayName: 'SearchBox',
+
+        _lastSearchPhrase: '',
+
         /**
          * Initial state
          */
@@ -40,9 +43,18 @@ function(
             else if ( ev.key == 'Enter' )
                 this.refs.suggestions.clickSelected();
             else {
-                var search = _.bind( this.startLoadSuggestions, this );
+                
+                var search = _.bind( function(){
+                    var s = this.getSearchPhrase();
 
-                // Search palaižam nākošajā tick, lai uzreiz iegūtu ievadīto simbolu
+                    // Search only if user has changed search phrase
+                    if ( s !== this._lastSearchPhrase ) {
+                        this._lastSearchPhrase = s;
+                        this.startLoadSuggestions()
+                    }
+                }, this );
+
+                // Delay search for next execution cycle, to get search field input
                 _.delay( search, 1 )
             }
         },
@@ -60,21 +72,34 @@ function(
          * Ielādējam suggestions
          */
         loadSuggestions: function() {
-            $.get( 'http://pad.dyndns.org/lpindex/app/search/', {
-                q: this.getSearchPhrase()
-            }, _.bind( function( response ) {
-                // Papildinām katru item ar property full
-                for ( var i in response.results )
-                    if ( typeof response.results[i].full == 'undefined' )
-                        response.results[i].full = '';
-                
-                if ( response.results.length == 1 && response.results[0].index )
-                    this.handleSelectedSuggestion( response.results[0] );
-                
+            var s = this.getSearchPhrase();
+
+            // Update suggestions in state
+            var setSuggestions = _.bind( function( d ){
                 this.setState({ 
-                    suggestions: response.results 
+                    suggestions: d
                 });
-            }, this ), 'json' );
+            }, this );
+
+            // Ja nav ievadīta search frāze, tad nemeklējam
+            if ( s == '' )
+                setSuggestions([]);
+            else
+                $.get( 'http://pad.dyndns.org/lpindex/app/search/', {
+                    q: s
+                }, _.bind( function( response ) {
+                    
+                    // Papildinām katru item ar property full
+                    for ( var i in response.results )
+                        if ( typeof response.results[i].full == 'undefined' )
+                            response.results[i].full = '';
+                    
+                    if ( response.results.length == 1 && response.results[0].index )
+                        this.handleSelectedSuggestion( response.results[0] );
+                    
+                    setSuggestions( response.results );
+
+                }, this ), 'json' );
         },
         handleSelectedSuggestion: function( item ) {
             
