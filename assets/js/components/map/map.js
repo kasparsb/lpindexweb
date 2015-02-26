@@ -80,7 +80,19 @@ define(['react', 'components/map/infowindow', 'markerclusterer'], function(React
             _(this.markers).each(function(m){
                 markers.push( m.marker );
             });
-            this.mc = new MarkerClusterer(this.map, markers);
+            this.mc = new MarkerClusterer( this.map, markers );
+            this.mc.setStyles([
+                {
+                    url: 'assets/images/cluster.png',
+                    width: 29,
+                    height: 37,
+                    backgroundSize: '29px 37px',
+                    textColor: '#ffd34b',
+                    lineHeight: 30,
+                    textSize: 14
+                }
+            ])
+            //console.log(this.mc.getStyles());
         },
         addMarker: function( place, lat, lng ) {
             
