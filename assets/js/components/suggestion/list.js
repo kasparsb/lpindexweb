@@ -36,8 +36,15 @@ define(['react', 'components/suggestion/single'], function(React, Suggestion) {
             this._selectItem(this._current);
         },
 
+        /**
+         * Click first selected item
+         */
         clickSelected: function() {
-            this.$items.find('.selected').click();
+            this.$items.find('.selected:eq(0)').click();
+        },
+
+        isSelected: function() {
+            return this.$items.find('.selected').length > 0;
         },
 
         _validateCurrent: function() {

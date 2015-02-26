@@ -25,7 +25,15 @@ function(
     return React.createClass({
         displayName: 'SearchBox',
 
+        _searchUrl: 'http://pad.dyndns.org/lpindex/app/search/',
+
         _lastSearchPhrase: '',
+
+        /**
+         * Shoukld we select suggestion if only one suggestion found
+         * If case of enter key it is usefull
+         */
+        _immediatelySelectSingleSuggestion: false,
 
         /**
          * Initial state
@@ -46,7 +54,7 @@ function(
                     // Search only if user has changed search phrase
                     if ( s !== this._lastSearchPhrase ) {
                         this._lastSearchPhrase = s;
-                        
+
                         this.startLoadSuggestions()
                     }
                 }, this );
@@ -60,20 +68,36 @@ function(
          */
         keyTypeHandlers: {
             execute: function( ev ) {
-                if ( typeof this.keyTypeHandlers[ev.key] == 'function' ) {
-                    ev.preventDefault();
-                    this.keyTypeHandlers[ev.key].call( this );
-                    return true;
-                }
+                if ( typeof this.keyTypeHandlers[ev.key] == 'function' )
+                    return this.keyTypeHandlers[ev.key].call( this, ev );
             },
-            ArrowDown: function() {
+
+            // If methods below returns true, then no search will be executed
+            ArrowDown: function(ev) {
+                ev.preventDefault();
                 this.refs.suggestions.next();
+                return true;
             },
-            ArrowUp: function() {
+            ArrowUp: function(ev) {
+                ev.preventDefault();
                 this.refs.suggestions.prev();
+                return true;
             },
             Enter: function() {
-                this.refs.suggestions.clickSelected();
+                // If there ir selected suggestion, then click it
+                if ( this.refs.suggestions.isSelected() ) {
+                    this.refs.suggestions.clickSelected();
+                    return true;
+                }
+                // If suggestions available, then select single
+                else if ( this.state.suggestions.length > 0 && this.selectSingleSuggestion() ) {
+                    return true;
+                }
+                else {
+                    // After loading suggestions immediately select single suggestion
+                    this._immediatelySelectSingleSuggestion = true;
+                    return false;
+                }
             }
         },
         startLoadSuggestions: function() {
@@ -90,34 +114,52 @@ function(
          * Ielādējam suggestions
          */
         loadSuggestions: function() {
+            // Avoid paralell running requests
+            if ( this._searchRequest )
+                this._searchRequest.abort();
+
             var s = this.getSearchPhrase();
 
             // Update suggestions in state
             var setSuggestions = _.bind( function( d ){
+                // Papildinām katru item ar property full
+                for ( var i in d )
+                    if ( typeof d[i].full == 'undefined' )
+                        d[i].full = '';
+
                 this.setState({ 
                     suggestions: d
                 });
             }, this );
 
-            // Ja nav ievadīta search frāze, tad nemeklējam
+            var handleResponse = _.bind( function( response ) {
+                this._searchRequest = false;
+
+                setSuggestions( response.results );
+                this.checkImmediateSelect();
+            }, this );
+
+            // Ja nav ievadīta search frāze, tad nemeklējam un notīrām esošos suggestions
             if ( s == '' )
                 setSuggestions([]);
             else
-                $.get( 'http://pad.dyndns.org/lpindex/app/search/', {
-                    q: s
-                }, _.bind( function( response ) {
-                    
-                    // Papildinām katru item ar property full
-                    for ( var i in response.results )
-                        if ( typeof response.results[i].full == 'undefined' )
-                            response.results[i].full = '';
-                    
-                    if ( response.results.length == 1 && response.results[0].index )
-                        this.handleSelectedSuggestion( response.results[0] );
-                    
-                    setSuggestions( response.results );
-
-                }, this ), 'json' );
+                this._searchRequest = $.get( this._searchUrl, { q: s }, handleResponse, 'json' );
+        },
+        checkImmediateSelect: function() {
+            if ( this._immediatelySelectSingleSuggestion )
+                this.selectSingleSuggestion();        
+            
+            this._immediatelySelectSingleSuggestion = false;
+        },
+        /**
+         * If there is one suggestion then select it and return true
+         */
+        selectSingleSuggestion: function() {
+            if ( this.state.suggestions.length == 1 && this.state.suggestions[0].index ) {
+                this.handleSelectedSuggestion( this.state.suggestions[0] );
+                return true;
+            }
+            return false;
         },
         handleSelectedSuggestion: function( item ) {
             
